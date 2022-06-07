@@ -3,35 +3,71 @@
 #include <stdio.h>
 #include <stddef.h>
 /**
- * is_palindrome - checks if a singly linked list is a palindrome.
+ * reverse_listint - reverses a linked list
  * @head: pointer to the list.
  * Return: 0 if it is not a palindrome, 1 if it is a palindrome or -1 (error).
  */
+void reverse_listint(listint_t **head)
+{
+	listint_t *prev = NULL;
+	listint_t *current = *head;
+	listint_t *next = NULL;
+
+	while (current)
+	{
+		next = current->next;
+		current->next = prev;
+		prev = current;
+		current = next;
+	}
+
+	*head = prev;
+}
+
+/**
+ * is_palindrome - checks if a linked list is a palindrome
+ * @head: double pointer to the linked list
+ *
+ * Return: 1 if it is, 0 if not
+ */
 int is_palindrome(listint_t **head)
 {
-	listint_t *aux;
-	int len, i, *copy;
+	listint_t *slow = *head, *fast = *head, *temp = *head, *dup = NULL;
 
-	/* empty list */
-	if (!*head || !head)
+	if (*head == NULL || (*head)->next == NULL)
 		return (1);
-	/* calculate length of the list */
-	aux = *head;
-	for (len = 1; aux->next; len++)
-		aux = aux->next;
-	/* create a copy of the list in an array */
-	copy = malloc(sizeof(int) * (len));
-	if (!copy)
-		return (-1);
-	for (i = 0, aux = *head; i < len; i++, aux = aux->next)
-		copy[i] = aux->n;
-	/* checks if its a palindrome */
-	for (i = 0; i < (len / 2); i++)
-		if (copy[i] != copy[len - 1 - i])
+
+	while (1)
+	{
+		fast = fast->next->next;
+		if (!fast)
 		{
-			free(copy);
-			return (0);
+			dup = slow->next;
+			break;
 		}
-	free(copy);
-	return (1);
+		if (!fast->next)
+		{
+			dup = slow->next->next;
+			break;
+		}
+		slow = slow->next;
+	}
+
+	reverse_listint(&dup);
+
+	while (dup && temp)
+	{
+		if (temp->n == dup->n)
+		{
+			dup = dup->next;
+			temp = temp->next;
+		}
+		else
+			return (0);
+	}
+
+	if (!dup)
+		return (1);
+
+	return (0);
 }
